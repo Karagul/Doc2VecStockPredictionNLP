@@ -21,6 +21,14 @@ def open_csv():
         df = df.append(load_df)
     return df
 
+def sector_ric():
+    """
+    Read sector symbol 
+    """
+    df = pd.read_csv("data/tech_sector_ric.csv")
+    ric = df["RIC"].tolist()
+    return ric 
+
 def clean_headline(text_list):
     """
     Pre-processing the data 
@@ -42,4 +50,3 @@ def encode_to_doc2vec(model, text_list):
     doc_vector = [] 
     
     return doc_vector 
-    
