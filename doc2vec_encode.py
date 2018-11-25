@@ -97,7 +97,7 @@ def clean_headline(text_list):
             if word[0] == ' ':
                 word = word[1:]
 
-        word = word.upper()
+        word = word.lower()
 
         if word != "" and word not in memory :
             text_list_change.append(word)
