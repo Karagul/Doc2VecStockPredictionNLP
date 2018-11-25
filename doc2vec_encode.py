@@ -43,7 +43,7 @@ def clean_headline(text_list):
     wantToChange = ['\\\\','..','--'] #ลบตัวที่ไม่ต้องการทิ้ง
     memory = []
     text_list_change = []
-    for x in text_list["headline"]:
+    for x in text_list:
         word = x
         if ('{' in word):
             wordSplit = word.split('{')
