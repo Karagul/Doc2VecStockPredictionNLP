@@ -36,17 +36,36 @@ def clean_headline(text_list):
     2. cut special alphabets
     3. change to lower 
 
-
     input variable : text_list --> list/series/array of string 
     input type : list/series/array-like 
     return list/series/array-like of cleaning data 
     """
     return text_list 
 
-def encode_to_doc2vec(model, text_list):
+def encode_to_doc2vec(model, text_list, verbose=False):
     """
     Encode document 
+
+    input variable : text_list --> list/series/array of string 
+    input type : list/series/array-like 
+    return 2d list/array 
     """
     doc_vector = [] 
-    
+    for paragraph in text_list : 
+        vec = model.infer_vector(paragraph)
+        doc_vector.append(vec)
+        if verbose : 
+            print("Encode : " + paragraph + " to ", vec)
     return doc_vector 
+
+def select_data(df, ric):   
+    """
+    Select only used data 
+    """
+    return df 
+
+if __name__ == "__main__":
+    model= Doc2Vec.load("d2v_60.model")  
+    news_df = open_csv()
+    news_df.headline = clean_headline(news_df.headline)
+    
