@@ -40,7 +40,72 @@ def clean_headline(text_list):
     input type : list/series/array-like
     return list/series/array-like of cleaning data
     """
-    return text_list
+    wantToChange = ['\\\\','..','--'] #ลบตัวที่ไม่ต้องการทิ้ง
+    memory = []
+    text_list_change = []
+    for x in text_list["headline"]:
+        word = x
+        if ('{' in word):
+            wordSplit = word.split('{')
+            CreateWord = ''
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split('}')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('}')[1]
+                elif len(CreateWord.split('}')) != 1:
+                    CreateWord = CreateWord.split('{')[0]+CreateWord.split('}')[1]
+                else:
+                    CreateWord = CreateWord.split('{')[0]
+        
+            word = CreateWord
+        if '(' in word:
+            wordSplit = word.split('(')
+            CreateWord = ''
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split(')')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split(')')[1]
+                elif len(CreateWord.split(')')) != 1:
+                    CreateWord = CreateWord.split('(')[0]+CreateWord.split(')')[1]
+                else:
+                    CreateWord = CreateWord.split('(')[0]
+        
+            word = CreateWord
+        if '<' in word:
+            wordSplit = word.split('<')
+            CreateWord = ''
+            # try:
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split('>')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('>')[1]
+                elif len(CreateWord.split('>')) != 1:
+                    CreateWord = CreateWord.split('<')[0]+CreateWord.split('>')[1]
+                else:
+                    CreateWord = CreateWord.split('<')[0]
+        
+            word = CreateWord
+
+        if '- Part' in word:
+            word = word.split('- Part')[0]
+        
+        for a in range(len(wantToChange)):
+            if wantToChange[a] in word:
+                word = word.replace(wantToChange[a],'')        
+
+        while '  ' in word:
+            word = word.replace('  ',' ')
+        
+        if ' ' in word:
+            if word[0] == ' ':
+                word = word[1:]
+
+        word = word.upper()
+
+        if word != "" and word not in memory :
+            text_list_change.append(word)
+            if len(memory) > 5:
+                del memory[0]
+            memory.append(word)
+
+    return text_list_change
 
 def encode_to_doc2vec(model, text_list, verbose=False):
     """
