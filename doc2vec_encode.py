@@ -11,12 +11,8 @@ def open_csv():
                                'sentimentNegative', 'sentimentNeutral',
                                'sentimentPositive'])
     file_count = 10
-    for i in range(0,file_count):
-        i += 1
-        if i < 10 :
-            file_name = "data/news/news_data_"+str(0)+str(i)+".csv"
-        else :
-            file_name = "data/news/news_data_"+str(i)+".csv"
+    for i in range(file_count):
+        file_name = "data/news/news_data_" + "{:02}".format(i+1) + ".csv"
         print("Open : " + file_name)
         load_df = pd.read_csv(file_name)
         load_df = load_df[[['time', 'headline', 'assetCodes',
