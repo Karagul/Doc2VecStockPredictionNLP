@@ -1,5 +1,4 @@
 import pandas as pd
-import gensim
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from nltk.tokenize import word_tokenize
 
@@ -15,9 +14,9 @@ def open_csv():
         file_name = "data/news/news_data_" + "{:02}".format(i+1) + ".csv"
         print("Open : " + file_name)
         load_df = pd.read_csv(file_name)
-        load_df = load_df[[['time', 'headline', 'assetCodes',
+        load_df = load_df[['time', 'headline', 'assetCodes',
                             'sentimentNegative', 'sentimentNeutral',
-                            'sentimentPositive']]]
+                            'sentimentPositive']]
         df = df.append(load_df)
     return df
 
@@ -117,19 +116,29 @@ def encode_to_doc2vec(model, text_list, verbose=False):
     """
     doc_vector = []
     for paragraph in text_list :
+        paragraph = paragraph.to_lower() 
         vec = model.infer_vector(paragraph)
         doc_vector.append(vec)
         if verbose :
-            print("Encode : " + paragraph + " to ", vec)
+            print("="*20)
+            print("Encode : " + paragraph + "\n To :", vec)
+            print("="*20)
     return doc_vector
 
 def select_data(df, ric):
     """
     Select only used data
     """
+    df = df[df["assetCodes"].str.contains(ric)]
+    df = df.dropna()
+#    print(df)
     return df
 
+
 if __name__ == "__main__":
-    model= Doc2Vec.load("d2v_60.model")
+#    model= Doc2Vec.load("d2v_60.model")
     news_df = open_csv()
     news_df.headline = clean_headline(news_df.headline)
+    goog_df = select_data(news_df, "GOOG")
+#    goog_df.to_csv("data/news/goog_news.csv")
+    
