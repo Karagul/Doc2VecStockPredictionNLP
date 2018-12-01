@@ -47,38 +47,32 @@ def clean_headline(text_list):
         if ('{' in word):
             wordSplit = word.split('{')
             CreateWord = ''
-            for y in range(len(wordSplit)-1):
-                if CreateWord == '' and len(CreateWord.split('}')) != 1:
-                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('}')[1]
-                elif len(CreateWord.split('}')) != 1:
-                    CreateWord = CreateWord.split('{')[0]+CreateWord.split('}')[1]
-                else:
-                    CreateWord = CreateWord.split('{')[0]
+            for y in range(len(wordSplit)):
+                if CreateWord == '' and '}' in word:
+                    CreateWord = wordSplit[y]
+                elif '}' in wordSplit[y]:
+                    CreateWord = CreateWord + wordSplit[y].split('}')[1]
         
             word = CreateWord
         if '(' in word:
             wordSplit = word.split('(')
             CreateWord = ''
-            for y in range(len(wordSplit)-1):
-                if CreateWord == '' and len(CreateWord.split(')')) != 1:
-                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split(')')[1]
-                elif len(CreateWord.split(')')) != 1:
-                    CreateWord = CreateWord.split('(')[0]+CreateWord.split(')')[1]
-                else:
-                    CreateWord = CreateWord.split('(')[0]
+            for y in range(len(wordSplit)):
+                if CreateWord == '' and ')' in word:
+                    CreateWord = wordSplit[y]
+                elif ')' in wordSplit[y]:
+                    CreateWord = CreateWord + wordSplit[y].split(')')[1]
         
             word = CreateWord
         if '<' in word:
             wordSplit = word.split('<')
             CreateWord = ''
-            # try:
-            for y in range(len(wordSplit)-1):
-                if CreateWord == '' and len(CreateWord.split('>')) != 1:
-                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('>')[1]
-                elif len(CreateWord.split('>')) != 1:
-                    CreateWord = CreateWord.split('<')[0]+CreateWord.split('>')[1]
-                else:
-                    CreateWord = CreateWord.split('<')[0]
+
+            for y in range(len(wordSplit)):
+                if CreateWord == '' and '>' in word:
+                    CreateWord = wordSplit[y]
+                elif '>' in wordSplit[y]:
+                    CreateWord = CreateWord + wordSplit[y].split('>')[1]
         
             word = CreateWord
 
