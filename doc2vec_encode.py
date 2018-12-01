@@ -43,36 +43,42 @@ def clean_headline(text_list):
     memory = []
     text_list_change = []
     for x in text_list:
-        word = x
+        word = str(x)
         if ('{' in word):
             wordSplit = word.split('{')
             CreateWord = ''
-            for y in range(len(wordSplit)):
-                if CreateWord == '' and '}' in word:
-                    CreateWord = wordSplit[y]
-                elif '}' in wordSplit[y]:
-                    CreateWord = CreateWord + wordSplit[y].split('}')[1]
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split('}')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('}')[1]
+                elif len(CreateWord.split('}')) != 1:
+                    CreateWord = CreateWord.split('{')[0]+CreateWord.split('}')[1]
+                else:
+                    CreateWord = CreateWord.split('{')[0]
         
             word = CreateWord
         if '(' in word:
             wordSplit = word.split('(')
             CreateWord = ''
-            for y in range(len(wordSplit)):
-                if CreateWord == '' and ')' in word:
-                    CreateWord = wordSplit[y]
-                elif ')' in wordSplit[y]:
-                    CreateWord = CreateWord + wordSplit[y].split(')')[1]
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split(')')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split(')')[1]
+                elif len(CreateWord.split(')')) != 1:
+                    CreateWord = CreateWord.split('(')[0]+CreateWord.split(')')[1]
+                else:
+                    CreateWord = CreateWord.split('(')[0]
         
             word = CreateWord
         if '<' in word:
             wordSplit = word.split('<')
             CreateWord = ''
-
-            for y in range(len(wordSplit)):
-                if CreateWord == '' and '>' in word:
-                    CreateWord = wordSplit[y]
-                elif '>' in wordSplit[y]:
-                    CreateWord = CreateWord + wordSplit[y].split('>')[1]
+            # try:
+            for y in range(len(wordSplit)-1):
+                if CreateWord == '' and len(CreateWord.split('>')) != 1:
+                    CreateWord = CreateWord + wordSplit[0] + wordSplit[1].split('>')[1]
+                elif len(CreateWord.split('>')) != 1:
+                    CreateWord = CreateWord.split('<')[0]+CreateWord.split('>')[1]
+                else:
+                    CreateWord = CreateWord.split('<')[0]
         
             word = CreateWord
 
@@ -92,12 +98,7 @@ def clean_headline(text_list):
 
         word = word.lower()
 
-        if word != "" and word not in memory :
-            text_list_change.append(word)
-            if len(memory) > 5:
-                del memory[0]
-            memory.append(word)
-
+        text_list_change.append(word)
     return text_list_change
 
 def encode_to_doc2vec(model, text_list, verbose=False):
@@ -110,13 +111,10 @@ def encode_to_doc2vec(model, text_list, verbose=False):
     """
     doc_vector = []
     for paragraph in text_list :
-        paragraph = paragraph.to_lower() 
         vec = model.infer_vector(paragraph)
         doc_vector.append(vec)
         if verbose :
-            print("="*20)
-            print("Encode : " + paragraph + "\n To :", vec)
-            print("="*20)
+            print("Encode : " + paragraph + " to ", vec)
     return doc_vector
 
 def select_data(df, ric):
@@ -125,13 +123,39 @@ def select_data(df, ric):
     """
     df = df[df["assetCodes"].str.contains(ric)]
     df = df.dropna()
-#    print(df)
     return df
 
+def combine_duplicate_headline(df):
+    df = df.set_index(df.time)
+    df = df.groupby(df.headline, as_index=False).mean()
+    return df
+
+def sort_data(df):
+    df.time = pd.to_datetime(df.time)
+    df = df.sort_values(by='time')
+    df = sum_sentiment(df)
+    df = df[['time','headline', 'sentiment']]
+    return df
+
+def sum_sentiment(df):
+    df['sentiment'] = df['sentimentPositive'] - df['sentimentNegative']
+    return df     
+
+def match_data_with_timestamp(df_source, df_used):
+    df_used = df_used.merge(df_source[['time','headline']].drop_duplicates('headline'))
+#    df_used = df_used.drop_duplicates()
+    df_used = sort_data(df_used)
+    return df_used
+
+
 if __name__ == "__main__":
-#    model= Doc2Vec.load("weight/d2v_60.model")
+    model= Doc2Vec.load("weight/d2v_final.model")
     news_df = open_csv()
-    news_df.headline = clean_headline(news_df.headline)
-    goog_df = select_data(news_df, "GOOG")
-#    goog_df.to_csv("data/news/goog_news.csv")
+    goog_df = select_data(news_df, 'GOOG')
+    goog_df['headline'] = clean_headline(goog_df.headline.tolist())
+    clean_df = combine_duplicate_headline(goog_df)
+    clean_df = match_data_with_timestamp(goog_df,clean_df)
+    doc2vec = encode_to_doc2vec(model, clean_df.headline, True)
+    
+    
     
