@@ -1,6 +1,7 @@
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from nltk.tokenize import word_tokenize
+from sklearn.preprocessing import MinMaxScaler 
 
 def open_csv():
     """
@@ -39,7 +40,7 @@ def clean_headline(text_list):
     input type : list/series/array-like
     return list/series/array-like of cleaning data
     """
-    wantToChange = ['\\\\','..','--'] #ลบตัวที่ไม่ต้องการทิ้ง
+    wantToChange = ['\\\\','...','--', '"', "'", '..'] #ลบตัวที่ไม่ต้องการทิ้ง
     memory = []
     text_list_change = []
     for x in text_list:
@@ -139,11 +140,13 @@ def sort_data(df):
 
 def sum_sentiment(df):
     df['sentiment'] = df['sentimentPositive'] - df['sentimentNegative']
+    sc = MinMaxScaler(feature_range=(-1,1))
+    df['sentiment'] = sc.fit_transform(df[['sentiment']])
     return df     
 
 def match_data_with_timestamp(df_source, df_used):
     df_used = df_used.merge(df_source[['time','headline']].drop_duplicates('headline'))
-#    df_used = df_used.drop_duplicates()
+#    df_used = df_used.dropna(subset=df_used.headline)
     df_used = sort_data(df_used)
     return df_used
 
