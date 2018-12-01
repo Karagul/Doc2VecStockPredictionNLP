@@ -134,9 +134,8 @@ def select_data(df, ric):
 #    print(df)
     return df
 
-
 if __name__ == "__main__":
-#    model= Doc2Vec.load("d2v_60.model")
+#    model= Doc2Vec.load("weight/d2v_60.model")
     news_df = open_csv()
     news_df.headline = clean_headline(news_df.headline)
     goog_df = select_data(news_df, "GOOG")
