@@ -2,6 +2,7 @@ import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from nltk.tokenize import word_tokenize
 from sklearn.preprocessing import MinMaxScaler 
+import numpy as np 
 
 def open_csv():
     """
@@ -150,6 +151,11 @@ def match_data_with_timestamp(df_source, df_used):
     df_used = sort_data(df_used)
     return df_used
 
+def convert_vector_to_dataframe(doc2vec):
+    colums_h = np.array(range(1,21))
+    doc_col = pd.DataFrame(doc2vec, columns=colums_h)   
+    return doc_col 
+
 
 if __name__ == "__main__":
     model= Doc2Vec.load("weight/d2v_final.model")
@@ -159,6 +165,11 @@ if __name__ == "__main__":
     clean_df = combine_duplicate_headline(goog_df)
     clean_df = match_data_with_timestamp(goog_df,clean_df)
     doc2vec = encode_to_doc2vec(model, clean_df.headline, True)
+    doc2vec_df = clean_df  
+    doc2vec_df.headline = doc2vec
+    vec2col = convert_vector_to_dataframe(doc2vec)
+    doc2vec_df = pd.concat([doc2vec_df,vec2col], axis=1)
+    doc2vec_df.to_csv('data/doc2vec_goog.csv', index=False)
     
     
     

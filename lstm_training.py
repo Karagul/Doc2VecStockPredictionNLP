@@ -1,5 +1,6 @@
 import pandas as pd 
 import numpy as np 
+import lstm_config as cf 
 
 dataset = pd.read_csv("")
 
@@ -7,8 +8,8 @@ dataset = pd.read_csv("")
 
 #Create slicing windows 
 X_train, y_train = [], [] 
-look_back = 5 
-pred_length = 1 
+look_back = cf.look_back 
+pred_length = cf.pred_length 
 
 for i in range(look_back, len(dataset)-pred_length):
     doc_vec = np.array(dataset['headline'][i-look_back:i]) 
@@ -26,10 +27,10 @@ from keras.callbacks import  EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, 
 
 regressor = Sequential()
 
-regressor.add(LSTM(units = 32, return_sequences = True, input_shape=input_shape, activation="relu"))
+regressor.add(LSTM(units = cf.layer1, return_sequences = True, input_shape=input_shape, activation="relu"))
 regressor.add(Dropout(0.25))  
 
-regressor.add(LSTM(units = 32, activation="relu"))
+regressor.add(LSTM(units = cf.layer2, activation="relu"))
 regressor.add(Dropout(0.25)) 
 
 regressor.add(Dense(units = 1, activation='relu')) 
